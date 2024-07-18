@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Web3ReactHooks, Web3ReactProvider } from "@web3-react/core";
+import { Connector } from "@web3-react/types";
+import { CONNECTORS } from "./wallet/connections";
+import Header from "./components/Header";
+import SwapInterface from "./components/SwapInterface";
+import WalletConnection from "./wallet/WalletConnection";
 
-function App() {
+const connectors: [Connector, Web3ReactHooks][] = Object.values(CONNECTORS).map(
+  (connector) => [connector.connector, connector.hooks]
+);
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Web3ReactProvider connectors={connectors}>
+      <div className="App">
+        <Header />
+        <WalletConnection />
+        <SwapInterface />
+      </div>
+    </Web3ReactProvider>
   );
-}
+};
 
 export default App;
