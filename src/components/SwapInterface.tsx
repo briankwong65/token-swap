@@ -16,9 +16,16 @@ const SwapInterface: React.FC = () => {
   const [outputAmount, setOutputAmount] = useState<string>("");
   const [isEthToUsdc, setIsEthToUsdc] = useState<boolean>(true);
 
+  const validateInputAmount = (amount: string): boolean => {
+    const numAmount = parseFloat(amount);
+    return !isNaN(numAmount) && numAmount > 0;
+  };
+
+  const isInputValid = validateInputAmount(inputAmount);
+
   const getEstimatedOutput = useCallback(async () => {
     if (!provider) return;
-    if (parseFloat(inputAmount) <= 0 || !parseFloat(inputAmount)) {
+    if (!isInputValid) {
       setOutputAmount("");
       return;
     }
@@ -39,16 +46,16 @@ const SwapInterface: React.FC = () => {
     } catch (error) {
       console.error("Error estimating output:", error);
     }
-  }, [inputAmount, isEthToUsdc, provider]);
+  }, [inputAmount, isEthToUsdc, isInputValid, provider]);
 
   useEffect(() => {
-    if (inputAmount && provider) {
+    if (inputAmount !== undefined && provider) {
       getEstimatedOutput();
     }
   }, [getEstimatedOutput, inputAmount, isEthToUsdc, provider]);
 
   const handleSwap = async () => {
-    if (!account || !provider) return;
+    if (!account || !provider || !isInputValid) return;
     const signer = provider.getSigner();
     const router = new ethers.Contract(UNISWAP_V2_ROUTER, ROUTER_ABI, signer);
     const wethAddress = await router.WETH();
@@ -118,7 +125,7 @@ const SwapInterface: React.FC = () => {
         readOnly
         placeholder={`${isEthToUsdc ? "USDC" : "ETH"} amount`}
       />
-      <button onClick={handleSwap} disabled={!account}>
+      <button onClick={handleSwap} disabled={!account || !isInputValid}>
         Swap
       </button>
     </div>
