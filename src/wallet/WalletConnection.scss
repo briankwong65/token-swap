@@ -1,0 +1,27 @@
+.WalletConnection {
+  &__connected-container {
+    display: flex;
+    align-items: center;
+
+    @media screen and (max-width: 1024px) {
+      flex-direction: column;
+      align-items: flex-end;
+    }
+  }
+
+  &__disconnect-button {
+    margin-left: 10px;
+  }
+
+  &__connect-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__metamask-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+}

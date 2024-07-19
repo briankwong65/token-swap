@@ -10,7 +10,7 @@ import {
 } from "../constants";
 import "./SwapInterface.scss";
 
-const SwapInterface: React.FC = () => {
+const SwapInterface = () => {
   const { account, provider } = useWeb3React();
   const [inputAmount, setInputAmount] = useState<string>("");
   const [outputAmount, setOutputAmount] = useState<string>("");
@@ -108,8 +108,11 @@ const SwapInterface: React.FC = () => {
   };
 
   return (
-    <div>
-      <select onChange={(e) => setIsEthToUsdc(e.target.value === "true")}>
+    <div className="SwapInterface">
+      <select
+        onChange={(e) => setIsEthToUsdc(e.target.value === "true")}
+        className="SwapInterface__select"
+      >
         <option value="true">ETH to USDC</option>
         <option value="false">USDC to ETH</option>
       </select>
@@ -118,14 +121,20 @@ const SwapInterface: React.FC = () => {
         value={inputAmount}
         onChange={(e) => setInputAmount(e.target.value)}
         placeholder={`${isEthToUsdc ? "ETH" : "USDC"} amount`}
+        className="SwapInterface__input"
       />
       <input
         type="number"
         value={outputAmount}
         readOnly
         placeholder={`${isEthToUsdc ? "USDC" : "ETH"} amount`}
+        className="SwapInterface__output"
       />
-      <button onClick={handleSwap} disabled={!account || !isInputValid}>
+      <button
+        onClick={handleSwap}
+        disabled={!account || !isInputValid}
+        className="SwapInterface__button"
+      >
         Swap
       </button>
     </div>

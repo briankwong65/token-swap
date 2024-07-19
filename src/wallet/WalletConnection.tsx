@@ -1,4 +1,6 @@
 import React from "react";
+import "./WalletConnection.scss";
+import classNames from "classnames";
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
 
@@ -6,7 +8,11 @@ const injected = new InjectedConnector({
   supportedChainIds: [1, 11155111], // Mainnet, Sepolia
 });
 
-const WalletConnection: React.FC = () => {
+interface WalletConnectionParams {
+  className?: string;
+}
+
+const WalletConnection = ({ className }: WalletConnectionParams) => {
   const { account, isActive, connector } = useWeb3React();
 
   const connect = async () => {
@@ -29,15 +35,30 @@ const WalletConnection: React.FC = () => {
     }
   };
 
+  const shortenHash = (hash: string, symbols = 4): string =>
+    `${hash.slice(0, 2 + symbols)}...${hash.slice(-symbols)}`;
+
   return (
-    <div>
-      {isActive ? (
-        <div>
-          <span>Connected with {account}</span>
-          <button onClick={disconnect}>Disconnect</button>
+    <div className={classNames("WalletConnection", className)}>
+      {isActive && account ? (
+        <div className="WalletConnection__connected-container">
+          <div>{shortenHash(account)}</div>
+          <button
+            onClick={disconnect}
+            className="WalletConnection__disconnect-button"
+          >
+            Disconnect
+          </button>
         </div>
       ) : (
-        <button onClick={connect}>Connect to MetaMask</button>
+        <button onClick={connect} className="WalletConnection__connect-button">
+          <img
+            src="/metamask.png"
+            alt="MetaMask"
+            className="WalletConnection__metamask-icon"
+          />
+          Connect to MetaMask
+        </button>
       )}
     </div>
   );
