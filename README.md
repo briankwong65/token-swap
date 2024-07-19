@@ -26,11 +26,14 @@ This React application allows users to swap between ETH and USDC on the Ethereum
 ### `yarn`
 
 3. Create a `.env` file in the root directory and add:
-   For testnet
-   ###CONTEXT=local
+
+For testnet
+
+### CONTEXT=local
 
 For mainnet
-###CONTEXT=production
+
+### CONTEXT=production
 
 4. Start the development server:
 
