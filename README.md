@@ -1,46 +1,78 @@
-# Getting Started with Create React App
+# Token Swap Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This React application allows users to swap between ETH and USDC on the Ethereum mainnet / Ethereum Sepolia testnet using Uniswap V2 protocol.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Connect to MetaMask wallet
+- Swap ETH to USDC and USDC to ETH
+- Real-time price updates
+- Error handling and transaction status updates
+
+## Prerequisites
+
+- Node.js (v16 or later)
+- yarn
+- MetaMask browser extension
+
+## Setup
+
+1. Clone the repository:
+
+### `git clone https://github.com/briankwong65/token-swap.git`
+
+2. Install dependencies:
+
+### `yarn`
+
+3. Create a `.env` file in the root directory and add:
+   For testnet
+   ###CONTEXT=local
+
+For mainnet
+###CONTEXT=production
+
+4. Start the development server:
 
 ### `yarn start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Usage
 
-### `yarn test`
+1. Connect your MetaMask wallet to the Sepolia testnet.
+2. Click "Connect to MetaMask" in the app.
+3. Enter the amount of ETH or USDC you want to swap.
+4. Click "Swap" and confirm the transaction in MetaMask.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Configuration
+
+The application uses the following Sepolia testnet addresses:
+
+- Uniswap V2 Router: 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008
+- USDC: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+- WETH: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9
+
+These can be modified in the `src/config.js` file if needed.
+
+## Development
+
+- The main swap logic is implemented in `src/components/SwapInterface.tsx`.
+- Wallet connection is handled in `src/components/WalletConnection.tsx`.
+- The application uses web3-react for Ethereum interactions.
+
+## Deployment
+
+To build the app for production:
 
 ### `yarn build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+This creates a `build` folder with the production-ready application.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## License
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This project is licensed under the MIT License.
 
-### `yarn eject`
+## Disclaimer
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Use at your own risk on the Sepolia testnet. Do not use with real assets on mainnet without proper auditing and testing.
