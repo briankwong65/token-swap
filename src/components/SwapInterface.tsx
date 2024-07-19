@@ -1,20 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { ethers } from "ethers";
-import {
-  ERC20_ABI,
-  ROUTER_ABI,
-  UNISWAP_V2_ROUTER,
-  USDC_ADDRESS,
-  WETH_ADDRESS,
-} from "../constants";
+import { ERC20_ABI, ROUTER_ABI } from "../constants";
 import "./SwapInterface.scss";
+import config from "../config";
 
 const SwapInterface = () => {
   const { account, provider } = useWeb3React();
   const [inputAmount, setInputAmount] = useState<string>("");
   const [outputAmount, setOutputAmount] = useState<string>("");
   const [isEthToUsdc, setIsEthToUsdc] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
 
   const validateInputAmount = (amount: string): boolean => {
     const numAmount = parseFloat(amount);
@@ -31,13 +28,13 @@ const SwapInterface = () => {
     }
     try {
       const router = new ethers.Contract(
-        UNISWAP_V2_ROUTER,
+        config.UNISWAP_V2_ROUTER,
         ROUTER_ABI,
         provider
       );
       const path = isEthToUsdc
-        ? [WETH_ADDRESS, USDC_ADDRESS]
-        : [USDC_ADDRESS, WETH_ADDRESS];
+        ? [config.WETH_ADDRESS, config.USDC_ADDRESS]
+        : [config.USDC_ADDRESS, config.WETH_ADDRESS];
       const amountIn = ethers.utils.parseEther(inputAmount);
       const amounts = await router.getAmountsOut(amountIn, path);
       setOutputAmount(
@@ -55,17 +52,26 @@ const SwapInterface = () => {
   }, [getEstimatedOutput, inputAmount, isEthToUsdc, provider]);
 
   const handleSwap = async () => {
-    if (!account || !provider || !isInputValid) return;
-    const signer = provider.getSigner();
-    const router = new ethers.Contract(UNISWAP_V2_ROUTER, ROUTER_ABI, signer);
-    const wethAddress = await router.WETH();
-    const path = isEthToUsdc
-      ? [wethAddress, USDC_ADDRESS]
-      : [USDC_ADDRESS, wethAddress];
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
+    if (!account || !provider) return;
+
+    setError(null);
+    setStatus("Initiating swap...");
 
     try {
+      const signer = provider.getSigner();
+      const router = new ethers.Contract(
+        config.UNISWAP_V2_ROUTER,
+        ROUTER_ABI,
+        signer
+      );
+      const wethAddress = await router.WETH();
+      const path = isEthToUsdc
+        ? [wethAddress, config.USDC_ADDRESS]
+        : [config.USDC_ADDRESS, wethAddress];
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
+
       if (isEthToUsdc) {
+        setStatus("Swapping ETH for USDC...");
         const tx = await router.swapExactETHForTokens(
           0, // We're not setting a minimum amount out for simplicity
           path,
@@ -73,25 +79,28 @@ const SwapInterface = () => {
           deadline,
           { value: ethers.utils.parseEther(inputAmount) }
         );
+        setStatus("Waiting for transaction confirmation...");
         await tx.wait();
       } else {
+        setStatus("Approving USDC spend...");
         const usdcContract = new ethers.Contract(
-          USDC_ADDRESS,
+          config.USDC_ADDRESS,
           ERC20_ABI,
           signer
         );
         const allowance = await usdcContract.allowance(
           account,
-          UNISWAP_V2_ROUTER
+          config.UNISWAP_V2_ROUTER
         );
         const amountIn = ethers.utils.parseUnits(inputAmount, 6);
         if (allowance.lt(amountIn)) {
           const approveTx = await usdcContract.approve(
-            UNISWAP_V2_ROUTER,
+            config.UNISWAP_V2_ROUTER,
             amountIn
           );
           await approveTx.wait();
         }
+        setStatus("Swapping USDC for ETH...");
         const tx = await router.swapExactTokensForETH(
           amountIn,
           0, // We're not setting a minimum amount out for simplicity
@@ -99,11 +108,30 @@ const SwapInterface = () => {
           account,
           deadline
         );
+        setStatus("Waiting for transaction confirmation...");
         await tx.wait();
       }
-      console.log("Swap successful!");
+      setStatus("Swap successful!");
     } catch (error) {
       console.error("Swap failed:", error);
+      let errorMessage = "An unknown error occurred";
+      if (error instanceof Error) {
+        if (
+          error.message.includes("user rejected") ||
+          error.message.includes("ACTION_REJECTED")
+        ) {
+          errorMessage = "Swap failed: Transaction rejected";
+        } else if (error.message.includes("INSUFFICIENT_FUNDS")) {
+          errorMessage = "Swap failed: Insufficient funds";
+        } else if (error.message.includes("transaction failed")) {
+          errorMessage = `Swap failed: Transaction failed`;
+        } else {
+          errorMessage = "Swap failed";
+        }
+      }
+
+      setError(errorMessage);
+      setStatus(null);
     }
   };
 
@@ -137,6 +165,8 @@ const SwapInterface = () => {
       >
         Swap
       </button>
+      {status && <p className="SwapInterface__swap-status">{status}</p>}
+      {error && <p className="SwapInterface__swap-error">{error}</p>}
     </div>
   );
 };

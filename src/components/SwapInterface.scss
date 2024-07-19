@@ -53,6 +53,18 @@
       cursor: not-allowed;
     }
   }
+
+  &__swap-status {
+    margin-top: 10px;
+    color: #007bff;
+    font-weight: bold;
+  }
+  
+  &__swap-error {
+    margin-top: 10px;
+    color: #dc3545;
+    font-weight: bold;
+  }
 }
 
 .swap-container {
