@@ -27,10 +27,8 @@ This React application allows users to swap between ETH and USDC on the Ethereum
 
 3. Create a `.env` file in the root directory and copy content from
 
-- `.env.local`(for testnet)
+- `.env.local`(for testnet) (default)
 - `.env.production`(for mainnet)
-
-The default config is set to local(testnet).
 
 4. Start the development server:
 
