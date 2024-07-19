@@ -3,6 +3,8 @@ import "./WalletConnection.scss";
 import classNames from "classnames";
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
+import config from "../config";
+import { ConnectionType, switchNetwork } from "./connections";
 
 const injected = new InjectedConnector({
   supportedChainIds: [1, 11155111], // Mainnet, Sepolia
@@ -13,7 +15,7 @@ interface WalletConnectionParams {
 }
 
 const WalletConnection = ({ className }: WalletConnectionParams) => {
-  const { account, isActive, connector } = useWeb3React();
+  const { account, isActive, connector, chainId } = useWeb3React();
 
   const connect = async () => {
     try {
@@ -41,15 +43,31 @@ const WalletConnection = ({ className }: WalletConnectionParams) => {
   return (
     <div className={classNames("WalletConnection", className)}>
       {isActive && account ? (
-        <div className="WalletConnection__connected-container">
-          <div>{shortenHash(account)}</div>
-          <button
-            onClick={disconnect}
-            className="WalletConnection__disconnect-button"
-          >
-            Disconnect
-          </button>
-        </div>
+        chainId === config.chainId ? (
+          <div className="WalletConnection__container">
+            <div>{shortenHash(account)}</div>
+            <button
+              onClick={disconnect}
+              className="WalletConnection__disconnect-button"
+            >
+              Disconnect
+            </button>
+          </div>
+        ) : (
+          <div className="WalletConnection__container">
+            <div className="WalletConnection__wrong-network-label">
+              Wrong Network
+            </div>
+            <button
+              onClick={() =>
+                switchNetwork(config.chainId, ConnectionType.INJECTED)
+              }
+              className="WalletConnection__wrong-network-button"
+            >
+              Switch to {config.chainLabel}
+            </button>
+          </div>
+        )
       ) : (
         <button onClick={connect} className="WalletConnection__connect-button">
           <img

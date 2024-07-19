@@ -1,5 +1,5 @@
 .WalletConnection {
-  &__connected-container {
+  &__container {
     display: flex;
     align-items: center;
 
@@ -10,6 +10,10 @@
   }
 
   &__disconnect-button {
+    margin-left: 10px;
+  }
+
+  &__wrong-network-button {
     margin-left: 10px;
   }
 
